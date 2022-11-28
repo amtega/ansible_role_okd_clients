@@ -1,2 +1,16 @@
 ---
-# Role tasks
+
+- name: Setup okd clients
+  block:
+    - name: Gather okd clients version info
+      when: okd_clients_version == "latest"
+      ansible.builtin.include_tasks: gather.yml
+      tags:
+        - role::okd_clients::gather
+
+    - name: Install okd clients
+      ansible.builtin.include_tasks: install.yml
+      tags:
+        - role::okd_clients::install
+  tags:
+    - role::okd_clients

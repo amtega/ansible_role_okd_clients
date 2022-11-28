@@ -3,5 +3,6 @@
 - name: Converge
   hosts: molecule_hosts
   gather_facts: no
+  serial: 1   # Workaround for concurrent download limits on official site
   roles:
-    - amtega.template
+    - amtega.okd_clients

@@ -1,2 +1,77 @@
 ---
-# Role variables
+
+# Effective version
+
+okd_clients_effective_version: >-
+  {{ (okd_clients_version == "latest")
+     | ternary(okd_clients_latest_version | default(""),
+               okd_clients_version) }}
+
+# Artifact overrides
+
+okd_clients_common_artifact_overrides:
+  host: "https://{{ okd_clients_url | urlsplit('hostname') }}"
+  unarchive: yes
+  unarchive_remove: yes
+  version: "{{ okd_clients_effective_version }}"
+  timeout: "{{ okd_clients_timeout }}"
+  validate_certs: "{{ okd_clients_validate_certs }}"
+  no_log: "{{ okd_clients_no_log }}"
+
+okd_clients_openshift_client_artifact_overrides:
+  id: openshift_client
+  dest: "{{ okd_clients_openshift_client_dir }}"
+  unarchive_creates: "{{ okd_clients_openshift_client_dir }}/oc"
+
+okd_clients_openshift_install_artifact_overrides:
+  id: openshift_install
+  dest: "{{ okd_clients_openshift_install_dir }}"
+  unarchive_creates: "{{ okd_clients_openshift_install_dir }}/openshift-install"
+
+okd_clients_path_overrides:
+  path: >-
+    {{ okd_clients_url | urlsplit('path')
+       + "/"
+       + okd_clients_effective_version }}
+
+# Efective artifacts
+
+okd_clients_openshift_client_effective_artifact: >-
+  {{ okd_clients_openshift_client_artifact
+     | combine(okd_clients_common_artifact_overrides)
+     | combine(okd_clients_openshift_client_artifact_overrides)
+     | combine((okd_clients_openshift_client_artifact.path
+                | default("")
+                | length > 0) | ternary({}, okd_clients_path_overrides)) }}
+
+okd_clients_openshift_install_effective_artifact: >-
+  {{ okd_clients_openshift_install_artifact
+     | combine(okd_clients_common_artifact_overrides)
+     | combine(okd_clients_openshift_install_artifact_overrides)
+     | combine((okd_clients_openshift_install_artifact_overrides.path
+                | default("")
+                | length > 0) | ternary({}, okd_clients_path_overrides)) }}
+
+# Artifacts list to setup
+
+okd_clients_artifacts: >-
+  {{ (okd_clients_setup_openshift_client | bool)
+     | ternary([okd_clients_openshift_client_effective_artifact], [])
+     + (okd_clients_setup_openshift_install | bool)
+        | ternary([okd_clients_openshift_install_effective_artifact], []) }}
+
+# Install dirs
+
+okd_clients_openshift_client_dir_dict:
+  path: "{{ okd_clients_openshift_client_dir }}"
+  mode: "{{ okd_clients_openshift_client_dir_mode }}"
+
+okd_clients_openshift_install_dir_dict:
+  path: "{{ okd_clients_openshift_install_dir }}"
+  mode: "{{ okd_clients_openshift_install_dir_mode }}"
+
+okd_clients_dirs: >-
+  {{ (okd_clients_setup_openshift_client | bool)
+     | ternary([okd_clients_openshift_client_dir_dict], [])
+     + (okd_clients_setup_openshift_install | bool)
+        | ternary([okd_clients_openshift_install_dir_dict], []) }}

@@ -4,9 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-## [MAJOR.MINOR.PATCH] - YYYY-MM-DD
 ### Added
 - Item 1.
 - Item 2.
@@ -36,3 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Item 1.
 - Item 2.
 - Item N.
+
+## 1.0.0 (2022-11-28)
+
+### Feat
+
+- first release

@@ -3,3 +3,23 @@
 - name: Verify
   hosts: molecule_hosts
   gather_facts: no
+  tasks:
+    - name: Check okd clients binaries
+      ansible.builtin.stat:
+        path: "{{ okd_client_binary }}"
+      register: check_binaries_result
+      loop:
+        - "{{ okd_clients_openshift_client_dir }}/oc"
+        - "{{ okd_clients_openshift_client_dir }}/kubectl"
+        - "{{ okd_clients_openshift_install_dir }}/openshift-install"
+      loop_control:
+        loop_var: okd_client_binary
+
+    - name: Assert okd clients were installed
+      ansible.builtin.assert:
+        that: >-
+          check_binaries_result.results
+          | map(attribute="stat")
+          | selectattr("exists", "equalto", false)
+          | list
+          | length == 0

@@ -1,0 +1,38 @@
+---
+
+- name: Gather okd clients version info
+  block:
+    - name: Gather okd clients versions
+      ansible.builtin.uri:
+        url: "{{ okd_clients_url }}"
+        return_content: yes
+      register: okd_clients_version_result
+      changed_when: no
+
+    - name: Sort okd clients versions
+      ansible.builtin.shell:
+        set -o pipefail ;
+        echo -e "{{ okd_clients_unsorted_versions }}" | sort --version-sort
+      args:
+        warn: no
+      when: yes
+      register: okd_clients_sort_versions_result
+      changed_when: no
+      vars:
+        okd_clients_unsorted_versions: >-
+          {{ okd_clients_version_result.content.splitlines()
+            | select("search", "span class=.name.")
+            | select("search", ">[0-9]+\.[0-9]+\.[0-9]+<")
+            | map("regex_replace", ".*([0-9]+\.[0-9]+\.[0-9]+).*", "\1")
+            | join("\n") }}
+
+    - name: Setup fact with okd clients versions
+      ansible.builtin.set_fact:
+        okd_clients_versions: >-
+          {{ okd_clients_sort_versions_result.stdout_lines }}
+
+    - name: Setup fact with okd clients latest version
+      ansible.builtin.set_fact:
+        okd_clients_latest_version: "{{ okd_clients_versions | last }}"
+  tags:
+    - role::okd_clients::gather

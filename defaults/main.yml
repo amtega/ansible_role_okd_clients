@@ -1,2 +1,51 @@
 ---
-# Role default lower priority variables
+
+# Version to setup. You can use `latest` to download latest version
+
+okd_clients_version: latest
+
+# Clients to download
+
+okd_clients_setup_openshift_client: yes
+okd_clients_setup_openshift_install: yes
+
+# Install directories
+
+okd_clients_openshift_client_dir: /opt/openshift-client
+okd_clients_openshift_client_dir_mode: "0755"
+
+okd_clients_openshift_install_dir: /opt/openshift-install
+okd_clients_openshift_install_dir_mode: "0755"
+
+# Download options
+
+okd_clients_url: >-
+  https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp
+okd_clients_timeout: 120
+okd_clients_validate_certs: yes
+
+# Clients artifacts to download
+#
+# By default, the role points to official downloads.
+#
+# The role will override the following artifact properties according to role
+# settings: id, host, path, dest, unarchive, unarchive_creates,
+# unarchive_remove, version, validate_certs, no_log, timeout
+#
+# If you want install from another you must configure the artifacts variables.
+#
+# Take a look to `amtega.artifact` role documentation to known about supported
+# types of artifacts, their specific settings and how to configure a proxy if
+# necessary
+
+okd_clients_openshift_client_artifact:
+  type: https
+  file: openshift-client-linux.tar.gz
+
+okd_clients_openshift_install_artifact:
+  type: https
+  file: openshift-install-linux.tar.gz
+
+# Hide sensitive information
+
+okd_clients_no_log: yes

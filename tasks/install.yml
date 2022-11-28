@@ -1,0 +1,21 @@
+---
+
+- name: Install okd clients
+  block:
+    - name: Setup okd clients directories
+      ansible.builtin.file:
+        path: "{{ okd_clients_dir_item.path }}"
+        state: directory
+        mode: "{{ okd_clients_dir_item.mode }}"
+      loop: "{{ okd_clients_dirs }}"
+      loop_control:
+        loop_var: okd_clients_dir_item
+        label: "{{ okd_clients_dir_item.path }}"
+
+    - name: Install okd clients artifacts
+      ansible.builtin.include_role:
+        name: amtega.artifact
+      vars:
+        artifact_list: "{{ okd_clients_artifacts }}"
+  tags:
+    - role::okd_clients::install
